@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CachedManifest</key>
+	<dict>
+		<key>manifestData</key>
+		<data>
+		eyJkZXBlbmRlbmNpZXMiOltdLCJkaXNwbGF5TmFtZSI6ImpheCIsInBhY2th
+		Z2VLaW5kIjp7InJvb3QiOnt9fSwicGxhdGZvcm1zIjpbeyJvcHRpb25zIjpb
+		XSwicGxhdGZvcm1OYW1lIjoiaW9zIiwidmVyc2lvbiI6IjE1LjIifV0sInBy
+		b2R1Y3RzIjpbeyJuYW1lIjoiamF4Iiwic2V0dGluZ3MiOlt7ImJ1bmRsZUlk
+		ZW50aWZpZXIiOlsiY29tLmJlcmtzcGFyLmpheCJdfSx7InRlYW1JZGVudGlm
+		aWVyIjpbIlI5VjY0OFk0NzUiXX0seyJkaXNwbGF5VmVyc2lvbiI6WyIxLjAi
+		XX0seyJidW5kbGVWZXJzaW9uIjpbIjEiXX0seyJpT1NBcHBJbmZvIjpbeyJh
+		Y2NlbnRDb2xvciI6eyJwcmVzZXRDb2xvciI6eyJwcmVzZXRDb2xvciI6eyJy
+		YXdWYWx1ZSI6InJlZCJ9fX0sImFwcEljb24iOnsicGxhY2Vob2xkZXIiOnsi
+		aWNvbiI6eyJyYXdWYWx1ZSI6InBlbmNpbCJ9fX0sImNhcGFiaWxpdGllcyI6
+		W10sInN1cHBvcnRlZERldmljZUZhbWlsaWVzIjpbInBhZCIsInBob25lIl0s
+		InN1cHBvcnRlZEludGVyZmFjZU9yaWVudGF0aW9ucyI6W3sicG9ydHJhaXQi
+		Ont9fSx7ImxhbmRzY2FwZVJpZ2h0Ijp7fX0seyJsYW5kc2NhcGVMZWZ0Ijp7
+		fX0seyJwb3J0cmFpdFVwc2lkZURvd24iOnsiY29uZGl0aW9uIjp7ImRldmlj
+		ZUZhbWlsaWVzIjpbInBhZCJdfX19XX1dfV0sInRhcmdldHMiOlsiQXBwTW9k
+		dWxlIl0sInR5cGUiOnsiZXhlY3V0YWJsZSI6bnVsbH19XSwidGFyZ2V0TWFw
+		Ijp7IkFwcE1vZHVsZSI6eyJkZXBlbmRlbmNpZXMiOltdLCJleGNsdWRlIjpb
+		XSwibmFtZSI6IkFwcE1vZHVsZSIsInBhdGgiOiIuIiwicmVzb3VyY2VzIjpb
+		eyJwYXRoIjoiUmVzb3VyY2VzIiwicnVsZSI6eyJwcm9jZXNzIjp7fX19XSwi
+		c2V0dGluZ3MiOltdLCJ0eXBlIjoiZXhlY3V0YWJsZSJ9fSwidGFyZ2V0cyI6
+		W3siZGVwZW5kZW5jaWVzIjpbXSwiZXhjbHVkZSI6W10sIm5hbWUiOiJBcHBN
+		b2R1bGUiLCJwYXRoIjoiLiIsInJlc291cmNlcyI6W3sicGF0aCI6IlJlc291
+		cmNlcyIsInJ1bGUiOnsicHJvY2VzcyI6e319fV0sInNldHRpbmdzIjpbXSwi
+		dHlwZSI6ImV4ZWN1dGFibGUifV0sInRvb2xzVmVyc2lvbiI6eyJfdmVyc2lv
+		biI6IjUuNi4wIn19
+		</data>
+		<key>manifestHash</key>
+		<data>
+		K7UvOSDgXRiQUHNzQldszsUajOwFBVtmey20d4PllTQ=
+		</data>
+		<key>schemaVersion</key>
+		<integer>4</integer>
+		<key>swiftPMVersionString</key>
+		<string>5.7.1</string>
+	</dict>
+</dict>
+</plist>

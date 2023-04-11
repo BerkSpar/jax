@@ -8,8 +8,8 @@
 import Foundation
 
 class PhysicsCategory {
-    static let player: UInt32 = 0
-    static let waterGround: UInt32 = 1
-    static let grassGround: UInt32 = 2
-    static let sandGround: UInt32 = 3
+    static let player: UInt32 = 1
+    static let waterGround: UInt32 = 2
+    static let grassGround: UInt32 = 4
+    static let sandGround: UInt32 = 8
 }

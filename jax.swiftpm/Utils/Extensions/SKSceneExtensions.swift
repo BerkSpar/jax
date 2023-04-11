@@ -22,6 +22,10 @@ extension SKScene {
         sceneView.layer.add(shakeAnimation, forKey: "position")
     }
     
+    func simpleShake() {
+        sceneShake(shakeCount: 3, intensity: CGVector(dx: 3, dy: 1), shakeDuration: 0.3)
+    }
+    
     func bombShake() {
         sceneShake(shakeCount: 10, intensity: CGVector(dx: 12, dy: 6), shakeDuration: 0.3)
     }

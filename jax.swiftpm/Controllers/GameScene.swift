@@ -7,13 +7,14 @@
 
 import Foundation
 import SpriteKit
+import AVFAudio
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var player = PlayerNode()
     var cam = SKCameraNode()
+    var ui = SKNode()
     var tileMap: SKTileMapNode?
-    
-    var wallCollisionMask: UInt32 = 0x11 << 1
+    var soundManager = SoundManager()
     
     override func sceneDidLoad() {
         super.sceneDidLoad()
@@ -21,12 +22,38 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         configurePlayer()
         configureCamera()
         configureTileMap()
+        configurePhysics()
+    }
+    
+    func didBegin(_ contact: SKPhysicsContact) {
+        print("didBegin")
+        guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else {
+            return;
+        }
         
-        view?.showsPhysics = true
+        if (nodeA.name == "player") {
+            if (nodeB.name == "water") {
+                player.stopMove()
+            }
+        }
+        
+        if (nodeB.name == "player") {
+            if (nodeA.name == "water") {
+                player.stopMove()
+            }
+        }
     }
     
     func configurePlayer() {
         scene?.addChild(player)
+    }
+    
+    func configurePhysics() {
+        physicsWorld.contactDelegate = self
+    }
+    
+    func configureUI() {
+        ui = childNode(withName: "UI")!
     }
     
     func configureCamera() {
@@ -54,14 +81,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if (isEdgeTile) {
                     let x = CGFloat(col) * tileSize.width - halfWidth
                     let y = CGFloat(row) * tileSize.height - halfHeight
-                    let rect = CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height)
-                    let tileNode = SKShapeNode(rect: rect)
+//                    let rect = CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height)
+                    let tileNode = SKShapeNode()
                     tileNode.position = CGPoint(x: x, y: y)
                     tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
                     tileNode.physicsBody?.isDynamic = false
-                    tileNode.physicsBody?.contactTestBitMask = 1
-                    tileNode.physicsBody?.categoryBitMask = 1
-                    tileNode.physicsBody?.collisionBitMask = wallCollisionMask
+                    tileNode.name = "water"
+                    tileNode.physicsBody?.categoryBitMask = PhysicsCategory.waterGround
+                    tileNode.physicsBody?.collisionBitMask = PhysicsCategory.player
                     tileNode.physicsBody?.usesPreciseCollisionDetection = true
                     
                     tileMap.addChild(tileNode)
@@ -72,11 +99,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         camera?.position = player.position
+        ui.position = camera?.position ?? CGPoint(x: 0, y: 0)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        // player.attackAnimation()
-        // sceneShake(shakeCount: 10, intensity: CGVector(dx: 4, dy: 2), shakeDuration: 0.3)
+        for touch in touches {
+              let location = touch.location(in: self)
+              let touchedNode = atPoint(location)
+              if touchedNode.name == "AttackButton" {
+                  player.attack()
+                  simpleShake()
+                  
+                  return;
+              }
+         }
+        
         player.movePlayer(location: touches.first!.location(in: self))
     }
 }

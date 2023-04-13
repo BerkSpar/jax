@@ -23,18 +23,37 @@ class PlayerNode: SKSpriteNode {
         idleAnimation()
         
         name = "player"
+        zPosition = 100
         
-        let rect = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
-//        rect.strokeColor = .red
-//        addChild(rect)
+        let physicsFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
         
-        physicsBody = SKPhysicsBody(rectangleOf: rect.frame.size)
+        physicsBody = SKPhysicsBody(rectangleOf: physicsFrame.frame.size)
         physicsBody?.categoryBitMask = PhysicsCategory.player
         physicsBody?.contactTestBitMask = PhysicsCategory.waterGround
         physicsBody?.collisionBitMask = PhysicsCategory.waterGround
         physicsBody?.usesPreciseCollisionDetection = false
         physicsBody?.affectedByGravity = false
         physicsBody?.allowsRotation = false
+    }
+    
+    func removeCrosshair() {
+        scene?.childNode(withName: "crosshair")?.removeFromParent()
+    }
+    
+    func placeCrosshair(location: CGPoint) {
+        removeCrosshair()
+        
+        let crosshair = SKSpriteNode(texture: SKTexture(imageNamed: "crosshair"))
+        
+        crosshair.name = "crosshair"
+        crosshair.position = location
+        
+        scene?.addChild(crosshair)
+        
+        crosshair.run(.repeatForever(.sequence([
+            .scale(to: 0.6, duration: 0.4),
+            .scale(to: 1, duration: 0.4)
+        ])))
     }
     
     func attack() {
@@ -45,10 +64,14 @@ class PlayerNode: SKSpriteNode {
     
     func stopMove() {
         removeAllActions()
+        removeCrosshair()
+        
         idleAnimation()
     }
     
     func movePlayer(location: CGPoint) {
+        placeCrosshair(location: location)
+        
         removeAllActions()
         
         runningAnimation()
@@ -58,8 +81,6 @@ class PlayerNode: SKSpriteNode {
         } else {
             xScale = 1;
         }
-//        physicsBody?.applyImpulse(CGVector(dx: location.x, dy: location.y))
-        
         
         let runAction = SKAction.move(
             to: CGPoint(
@@ -68,9 +89,11 @@ class PlayerNode: SKSpriteNode {
             ),
             duration: location.distance(point: position) * 0.005
         )
-//
-        run(runAction, completion: idleAnimation)
-         
+
+        run(runAction, completion: {
+            self.removeCrosshair()
+            self.idleAnimation()
+        })
     }
     
     func idleAnimation() {
@@ -85,10 +108,13 @@ class PlayerNode: SKSpriteNode {
         self.run(.animate(with: spriteSheet, timePerFrame: 0.05))
     }
     
-    func runningAnimation() {        
+    func runningAnimation() {
+        let runningAction = self.action(forKey: "running")
+        if (runningAction != nil) { return }
+        
         let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 1)! }
         
-        self.run(.repeatForever(.animate(with: spriteSheet, timePerFrame: 0.1)))
+        self.run(.repeatForever(.animate(with: spriteSheet, timePerFrame: 0.1)), withKey: "running")
     }
     
     required init?(coder aDecoder: NSCoder) {

@@ -23,10 +23,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         configureCamera()
         configureTileMap()
         configurePhysics()
+        configureUI()
+        
+        soundManager.playPlayback(intensity: 5)
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
-        print("didBegin")
         guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else {
             return;
         }
@@ -103,18 +105,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        for touch in touches {
-              let location = touch.location(in: self)
-              let touchedNode = atPoint(location)
-              if touchedNode.name == "AttackButton" {
-                  player.attack()
-                  simpleShake()
-                  
-                  return;
-              }
-         }
+        let touch = touches.first!.location(in: self)
         
-        player.movePlayer(location: touches.first!.location(in: self))
+        let touchedNode = atPoint(touch)
+        if touchedNode.name == "AttackButton" {
+            player.attack()
+            simpleShake()
+            touchedNode.run(.sequence([
+              .fadeAlpha(to: 0.3, duration: 0.1),
+              .fadeAlpha(to: 1, duration: 0.1)
+            ]))
+            
+            return;
+        }
+        
+        player.movePlayer(location: touch)
     }
 }
 

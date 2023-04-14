@@ -8,11 +8,11 @@
 import Foundation
 import SpriteKit
 
-class PlayerNode: SKSpriteNode {
+class EnemyNode: SKSpriteNode {
     private let sheet = SpriteSheet(
-        texture: SKTexture(imageNamed: "warrior"),
+        texture: SKTexture(imageNamed: "torch"),
         rows: 3,
-        columns: 6
+        columns: 7
     )
     
     init() {
@@ -22,98 +22,75 @@ class PlayerNode: SKSpriteNode {
         
         idleAnimation()
         
-        name = "player"
-        zPosition = 100
+        name = "torch"
+        zPosition = 90
         
         let physicsFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
+        physicsFrame.strokeColor = .red
         
         physicsBody = SKPhysicsBody(rectangleOf: physicsFrame.frame.size)
-        physicsBody?.categoryBitMask = PhysicsCategory.player
-        physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
+        physicsBody?.categoryBitMask = PhysicsCategory.torch
+        physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.player
         physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
         physicsBody?.usesPreciseCollisionDetection = false
         physicsBody?.affectedByGravity = false
         physicsBody?.allowsRotation = false
     }
     
-    func removeCrosshair() {
-        scene?.childNode(withName: "crosshair")?.removeFromParent()
-    }
-    
-    func placeCrosshair(location: CGPoint) {
-        removeCrosshair()
-        
-        let crosshair = SKSpriteNode(texture: SKTexture(imageNamed: "crosshair"))
-        
-        crosshair.name = "crosshair"
-        crosshair.position = location
-        
-        scene?.addChild(crosshair)
-        
-        crosshair.run(.repeatForever(.sequence([
-            .scale(to: 0.6, duration: 0.4),
-            .scale(to: 1, duration: 0.4)
-        ])))
-    }
-    
     func attack() {
-        stopMove()
         
-        attackAnimation()
     }
     
     func stopMove() {
         removeAllActions()
-        removeCrosshair()
         
         idleAnimation()
     }
     
-    func move(location: CGPoint) {
-        placeCrosshair(location: location)
-        
-//        runningAnimation()
-//
-//        if (location.x < position.x) {
-//            xScale = -1;
-//        } else {
-//            xScale = 1;
-//        }
-//
-//        let runAction = SKAction.move(
-//            to: CGPoint(
-//                x: location.x,
-//                y: location.y
-//            ),
-//            duration: location.distance(point: position) * 0.005
-//        )
-//
-//        run(runAction, completion: {
-//            self.removeCrosshair()
-//            self.idleAnimation()
-//        })
-        
-        let move = SKAction.customAction(withDuration: TimeInterval(Int.max), actionBlock: {
+    func follow(player: PlayerNode) {
+        let followPlayer = SKAction.customAction(withDuration: TimeInterval(Int.max), actionBlock: {
             (node,elapsedTime) in
-            let distance = node.position.distance(point: location)
-            print(distance)
-            if (distance < 3) {
-                self.idleAnimation()
-                self.removeCrosshair()
-            } else {
+            let distance = node.position.distance(point: player.position)
+            
+            if (distance > 80) {
                 self.runningAnimation()
-
-                let dx = location.x - node.position.x
-                let dy = location.y - node.position.y
+                
+                let dx = player.position.x - node.position.x
+                let dy = player.position.y - node.position.y
                 let angle = atan2(dx,dy)
-
-                node.position.x += sin(angle) * 2.5
-                node.position.y += cos(angle) * 2.5
-                node.xScale = location.x < node.position.x ? -1 : 1
+                node.position.x += sin(angle) * 2
+                node.position.y += cos(angle) * 2
+                node.xScale = player.position.x < node.position.x ? -1 : 1
+            } else {
+                self.idleAnimation()
             }
         })
+        
+        run(followPlayer, withKey: "follow_player")
+    }
+    
+    func move(location: CGPoint) {
+        removeAllActions()
+        
+        runningAnimation()
+        
+        if (location.x < position.x) {
+            xScale = -1;
+        } else {
+            xScale = 1;
+        }
+        
+        let runAction = SKAction.move(
+            to: CGPoint(
+                x: location.x,
+                y: location.y
+            ),
+            duration: location.distance(point: position) * 0.005
+        )
 
-        run(move, withKey: "move")
+        run(runAction, completion: {
+            self.idleAnimation()
+        })
     }
     
     func idleAnimation() {
@@ -121,7 +98,7 @@ class PlayerNode: SKSpriteNode {
         self.removeAction(forKey: "attack")
         
         if (self.action(forKey: "idle") == nil) {
-            let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 2)! }
+            let spriteSheet = Array(0...6).map { sheet.textureForColumn(column: $0, row: 2)! }
             
             self.run(.repeatForever(.animate(with: spriteSheet, timePerFrame: 0.1)), withKey: "idle")
         }

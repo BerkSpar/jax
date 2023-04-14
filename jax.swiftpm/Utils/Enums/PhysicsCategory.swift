@@ -12,4 +12,5 @@ class PhysicsCategory {
     static let waterGround: UInt32 = 2
     static let grassGround: UInt32 = 4
     static let sandGround: UInt32 = 8
+    static let torch: UInt32 = 16
 }

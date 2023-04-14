@@ -25,7 +25,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         configurePhysics()
         configureUI()
         
-        soundManager.playPlayback(intensity: 5)
+        let enemy = EnemyNode()
+        enemy.name = "torch"
+        addChild(enemy)
+        
+//        soundManager.playPlayback(intensity: 5)
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
@@ -33,17 +37,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             return;
         }
         
-        if (nodeA.name == "player") {
-            if (nodeB.name == "water") {
-                player.stopMove()
-            }
+        if (nodeA.name == "player" || nodeB.name == "player") {
+            player.stopMove()
         }
+    }
+    
+    func createRandomTorch() {
+        let enemy = EnemyNode()
+        enemy.position = CGPoint(
+            x: Int.random(in: 50..<500),
+            y: Int.random(in: 50..<500)
+        )
         
-        if (nodeB.name == "player") {
-            if (nodeA.name == "water") {
-                player.stopMove()
-            }
-        }
+        addChild(enemy)
+
+        enemy.follow(player: player)
     }
     
     func configurePlayer() {
@@ -83,7 +91,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if (isEdgeTile) {
                     let x = CGFloat(col) * tileSize.width - halfWidth
                     let y = CGFloat(row) * tileSize.height - halfHeight
-//                    let rect = CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height)
                     let tileNode = SKShapeNode()
                     tileNode.position = CGPoint(x: x, y: y)
                     tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
@@ -106,20 +113,21 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         let touch = touches.first!.location(in: self)
-        
+
         let touchedNode = atPoint(touch)
         if touchedNode.name == "AttackButton" {
             player.attack()
             simpleShake()
+            
             touchedNode.run(.sequence([
               .fadeAlpha(to: 0.3, duration: 0.1),
               .fadeAlpha(to: 1, duration: 0.1)
             ]))
-            
+
             return;
         }
-        
-        player.movePlayer(location: touch)
+
+        player.move(location: touch)
     }
 }
 

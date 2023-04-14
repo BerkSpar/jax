@@ -77,33 +77,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func configureTileMap() {
-        self.tileMap = self.childNode(withName: "Water Tile Map") as? SKTileMapNode
-        guard let tileMap = self.tileMap else { fatalError("Missing tile map for the level") }
-
-        let tileSize = tileMap.tileSize
-        let halfWidth = CGFloat(tileMap.numberOfColumns) / 2.0 * tileSize.width
-        let halfHeight = CGFloat(tileMap.numberOfRows) / 2.0 * tileSize.height
-
-        for col in 0..<tileMap.numberOfColumns {
-            for row in 0..<tileMap.numberOfRows {
-                let tileDefinition = tileMap.tileDefinition(atColumn: col, row: row)
-                let isEdgeTile = tileDefinition?.name != nil
-                if (isEdgeTile) {
-                    let x = CGFloat(col) * tileSize.width - halfWidth
-                    let y = CGFloat(row) * tileSize.height - halfHeight
-                    let tileNode = SKShapeNode()
-                    tileNode.position = CGPoint(x: x, y: y)
-                    tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
-                    tileNode.physicsBody?.isDynamic = false
-                    tileNode.name = "water"
-                    tileNode.physicsBody?.categoryBitMask = PhysicsCategory.waterGround
-                    tileNode.physicsBody?.collisionBitMask = PhysicsCategory.player
-                    tileNode.physicsBody?.usesPreciseCollisionDetection = true
-                    
-                    tileMap.addChild(tileNode)
-                }
-            }
-        }
+//        self.tileMap = self.childNode(withName: "Ground TileMap") as? SKTileMapNode
+//        guard let tileMap = self.tileMap else { fatalError("Missing tile map for the level") }
+//
+//        let tileSize = tileMap.tileSize
+//        let halfWidth = CGFloat(tileMap.numberOfColumns) / 2.0 * tileSize.width
+//        let halfHeight = CGFloat(tileMap.numberOfRows) / 2.0 * tileSize.height
+//
+//        for col in 0..<tileMap.numberOfColumns {
+//            for row in 0..<tileMap.numberOfRows {
+//                let tileDefinition = tileMap.tileDefinition(atColumn: col, row: row)
+//                let isEdgeTile = tileDefinition?.name != nil
+//                if (isEdgeTile) {
+//                    let x = CGFloat(col) * tileSize.width - halfWidth
+//                    let y = CGFloat(row) * tileSize.height - halfHeight
+//                    let tileNode = SKShapeNode()
+//                    tileNode.position = CGPoint(x: x, y: y)
+//                    tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
+//                    tileNode.physicsBody?.isDynamic = false
+//                    tileNode.name = "Water"
+//                    tileNode.physicsBody?.categoryBitMask = PhysicsCategory.waterGround
+//                    tileNode.physicsBody?.collisionBitMask = PhysicsCategory.player
+//                    tileNode.physicsBody?.usesPreciseCollisionDetection = true
+//
+//                    tileMap.addChild(tileNode)
+//                }
+//            }
+//        }
     }
     
     override func update(_ currentTime: TimeInterval) {

@@ -25,10 +25,15 @@ class EnemyNode: SKSpriteNode {
         name = "torch"
         zPosition = 90
         
-        let physicsFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
-        physicsFrame.strokeColor = .red
+        let physicsFrame = SKShapeNode(circleOfRadius: 32)
+        addChild(physicsFrame)
         
-        physicsBody = SKPhysicsBody(rectangleOf: physicsFrame.frame.size)
+        let attackFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
+        attackFrame.strokeColor = .red
+        addChild(attackFrame)
+        attackFrame.position.x += 32
+        
+        physicsBody = SKPhysicsBody(circleOfRadius: 32)
         physicsBody?.categoryBitMask = PhysicsCategory.torch
         physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.player
         physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch

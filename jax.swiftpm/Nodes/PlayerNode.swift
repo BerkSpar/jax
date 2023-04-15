@@ -25,12 +25,18 @@ class PlayerNode: SKSpriteNode {
         name = "player"
         zPosition = 100
         
-        let physicsFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
+        let physicsFrame = SKShapeNode(circleOfRadius: 32)
+        addChild(physicsFrame)
         
-        physicsBody = SKPhysicsBody(rectangleOf: physicsFrame.frame.size)
+        let attackFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
+        attackFrame.strokeColor = .red
+        addChild(attackFrame)
+        attackFrame.position.x += 32
+        
+        physicsBody = SKPhysicsBody(circleOfRadius: 32)
         physicsBody?.categoryBitMask = PhysicsCategory.player
         physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
-        physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
+        physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch | PhysicsCategory.tree
         physicsBody?.usesPreciseCollisionDetection = false
         physicsBody?.affectedByGravity = false
         physicsBody?.allowsRotation = false

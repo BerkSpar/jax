@@ -25,12 +25,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         configurePhysics()
         configureMap()
         configureUI()
-        
-        let enemy = EnemyNode()
-        enemy.name = "torch"
-        addChild(enemy)
-        
-        soundManager.playPlayback(intensity: 0)
+        configureSound()
     }
     
     func didBegin(_ contact: SKPhysicsContact) {
@@ -53,6 +48,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(enemy)
 
         enemy.follow(player: player)
+    }
+    
+    func configureSound() {
+        soundManager.playPlayback(intensity: 5)
     }
     
     func configurePlayer() {
@@ -87,7 +86,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if (mapNode.name == "tree") {
                 let rect = SKShapeNode(circleOfRadius: 16)
                 rect.position.y -= 64
-                mapNode.addChild(rect)
+                
+                if (GameManager.debugMode) {
+                    mapNode.addChild(rect)
+                }
                 
                 mapNode.run(.repeatForever(SKAction(named: "TreeIdleAnimation")!))
                 
@@ -105,7 +107,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             if (mapNode.name == "house") {
                 let rect = SKShapeNode(rectOf: CGSize(width: 96, height: 64))
                 rect.position.y -= 64
-                mapNode.addChild(rect)
+                
+                if (GameManager.debugMode) {
+                    mapNode.addChild(rect)
+                }
                 
                 mapNode.physicsBody = SKPhysicsBody(
                     rectangleOf: CGSize(width: 55, height: 32),
@@ -136,8 +141,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     let x = CGFloat(col) * tileSize.width - halfWidth
                     let y = CGFloat(row) * tileSize.height - halfHeight
                                         
-                    let rect = CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height)
-                    let tileNode = SKShapeNode(rect: rect)
+                    
+                    let tileNode = SKShapeNode()
                     tileNode.position = CGPoint(x: x, y: y)
                     tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
                     tileNode.physicsBody?.isDynamic = false
@@ -145,8 +150,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     tileNode.physicsBody?.categoryBitMask = PhysicsCategory.waterGround
                     tileNode.physicsBody?.collisionBitMask = PhysicsCategory.player
                     tileNode.physicsBody?.usesPreciseCollisionDetection = true
-
+                    
                     tileMap.addChild(tileNode)
+                    
+                    if (GameManager.debugMode) {
+                        let rect = SKShapeNode(rect: CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height))
+                        tileNode.addChild(rect)
+                    }
                 }
             }
         }

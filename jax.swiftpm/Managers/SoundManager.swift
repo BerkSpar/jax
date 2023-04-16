@@ -18,7 +18,7 @@ class SoundManager {
     
     private func setup() {
         for i in 1...playbackAudioCount {
-            let sound = URL(fileURLWithPath: Bundle.main.path(forResource: "sound_\(i)", ofType: "mpeg")!)
+            let sound = URL(fileURLWithPath: Bundle.main.path(forResource: "sound_\(i)", ofType: "mp3")!)
 
             try? AVAudioSession.sharedInstance().setCategory(.playback)
             try? AVAudioSession.sharedInstance().setActive(true)

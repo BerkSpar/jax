@@ -25,17 +25,23 @@ class PlayerNode: SKSpriteNode {
         name = "player"
         zPosition = 100
         
-        let physicsFrame = SKShapeNode(circleOfRadius: 32)
-        addChild(physicsFrame)
-        
         let attackFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
-        attackFrame.strokeColor = .red
-        addChild(attackFrame)
         attackFrame.position.x += 32
+        
+        if (GameManager.debugMode) {
+            attackFrame.strokeColor = .red
+            addChild(attackFrame)
+        }
+        
+        let physicsFrame = SKShapeNode(circleOfRadius: 32)
+        
+        if (GameManager.debugMode) {
+            addChild(physicsFrame)
+        }
         
         physicsBody = SKPhysicsBody(circleOfRadius: 32)
         physicsBody?.categoryBitMask = PhysicsCategory.player
-        physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
+        physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch | PhysicsCategory.tree
         physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch | PhysicsCategory.tree
         physicsBody?.usesPreciseCollisionDetection = false
         physicsBody?.affectedByGravity = false
@@ -98,8 +104,8 @@ class PlayerNode: SKSpriteNode {
 //            self.removeCrosshair()
 //            self.idleAnimation()
 //        })
-        
-        let move = SKAction.customAction(withDuration: TimeInterval(Int.max), actionBlock: {
+                
+        let move = SKAction.customAction(withDuration: TimeInterval(1), actionBlock: {
             (node,elapsedTime) in
             let distance = node.position.distance(point: location)
             print(distance)
@@ -115,11 +121,12 @@ class PlayerNode: SKSpriteNode {
 
                 node.position.x += sin(angle) * 2.5
                 node.position.y += cos(angle) * 2.5
+
                 node.xScale = location.x < node.position.x ? -1 : 1
             }
         })
 
-        run(move, withKey: "move")
+        run(.repeatForever(move), withKey: "move")
     }
     
     func idleAnimation() {

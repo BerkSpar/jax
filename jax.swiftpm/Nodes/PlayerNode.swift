@@ -9,14 +9,8 @@ import Foundation
 import SpriteKit
 
 class PlayerNode: SKSpriteNode {
-    private let sheet = SpriteSheet(
-        texture: SKTexture(imageNamed: "warrior"),
-        rows: 3,
-        columns: 6
-    )
-    
     init() {
-        let texture = sheet.textureForColumn(column: 0, row: 2)!
+        let texture = SKTexture(imageNamed: "warrior_idle_1")
         
         super.init(texture: texture, color: .gray, size: texture.size())
         
@@ -108,7 +102,6 @@ class PlayerNode: SKSpriteNode {
         let move = SKAction.customAction(withDuration: TimeInterval(1), actionBlock: {
             (node,elapsedTime) in
             let distance = node.position.distance(point: location)
-            print(distance)
             if (distance < 3) {
                 self.idleAnimation()
                 self.removeCrosshair()
@@ -134,21 +127,15 @@ class PlayerNode: SKSpriteNode {
         self.removeAction(forKey: "attack")
         
         if (self.action(forKey: "idle") == nil) {
-            let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 2)! }
-            
+            let spriteSheet = Array(0...5).map { SKTexture(imageNamed: "warrior_idle_\($0)") }
             self.run(.repeatForever(.animate(with: spriteSheet, timePerFrame: 0.1)), withKey: "idle")
         }
     }
     
     func attackAnimation() {
-        self.removeAction(forKey: "running")
-        self.removeAction(forKey: "idle")
+        let spriteSheet = Array(0...5).map { SKTexture(imageNamed: "warrior_attack_\($0)") }
         
-        if (self.action(forKey: "attack") == nil) {
-            let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 0)! }
-            
-            self.run(.animate(with: spriteSheet, timePerFrame: 0.05), withKey: "attack")
-        }
+        self.run(.animate(with: spriteSheet, timePerFrame: 0.05), withKey: "attack")
     }
     
     func runningAnimation() {
@@ -156,7 +143,7 @@ class PlayerNode: SKSpriteNode {
         self.removeAction(forKey: "attack")
         
         if (self.action(forKey: "running") == nil) {
-            let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 1)! }
+            let spriteSheet = Array(0...5).map { SKTexture(imageNamed: "warrior_running_\($0)") }
             
             self.run(.repeatForever(.animate(with: spriteSheet, timePerFrame: 0.1)), withKey: "running")
         }

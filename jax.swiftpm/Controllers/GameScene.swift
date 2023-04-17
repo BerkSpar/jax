@@ -9,12 +9,24 @@ import Foundation
 import SpriteKit
 import AVFAudio
 
+extension SKLabelNode {
+    func updateAttributedText(_ text: String) {
+        if let attributedText = attributedText {
+            let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
+            mutableAttributedText.mutableString.setString(text)
+            self.attributedText = mutableAttributedText
+        }
+    }
+}
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var player = PlayerNode()
     var cam = SKCameraNode()
     var ui = SKNode()
     var tileMap: SKTileMapNode?
     var soundManager = SoundManager()
+    var subtitle = SKLabelNode()
+    var attackButton = SKSpriteNode()
     
     override func sceneDidLoad() {
         super.sceneDidLoad()
@@ -39,10 +51,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func createRandomTorch() {
+        let rangeX = Int(player.position.x + 50)..<Int(player.position.x + 300)
+        let rangeY = Int(player.position.y + 50)..<Int(player.position.y + 300)
+        
         let enemy = EnemyNode()
         enemy.position = CGPoint(
-            x: Int.random(in: 50..<500),
-            y: Int.random(in: 50..<500)
+            x: Int.random(in: rangeX),
+            y: Int.random(in: rangeY)
         )
         
         addChild(enemy)
@@ -51,7 +66,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func configureSound() {
-        soundManager.playPlayback(intensity: 5)
+        soundManager.playPlayback(intensity: 0)
     }
     
     func configurePlayer() {
@@ -66,7 +81,25 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func configureUI() {
+        let displaySize: CGRect = UIScreen.main.bounds
+        let displayWidth = displaySize.width
+        let displayHeight = displaySize.height
+        
         ui = childNode(withName: "UI")!
+        
+        attackButton = ui.childNode(withName: "AttackButton") as! SKSpriteNode
+        attackButton.position = CGPoint(
+            x: displayWidth * 0.4,
+            y: displayHeight * -0.4
+        )
+//        attackButton.isHidden = true
+        
+        subtitle = ui.childNode(withName: "Subtitle") as! SKLabelNode
+        subtitle.position = CGPoint(
+            x: scene!.frame.midX,
+            y: displayHeight * -0.4
+        )
+        self.subtitle.isHidden = true
     }
     
     func configureCamera() {
@@ -74,9 +107,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scene?.addChild(cam)
         scene?.camera = cam
         
-        /// Scale up
-        // let zoomInAction = SKAction.scale(to: 0.5, duration: 1)
-        // cam.run(zoomInAction)
+        cam.run(.scale(to: 0.5, duration: 1))
     }
     
     func configureMap() {
@@ -164,7 +195,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         camera?.position = player.position
-        ui.position = camera?.position ?? CGPoint(x: 0, y: 0)
+        ui.position = cam.position
+        ui.xScale = cam.xScale
+        ui.yScale = cam.yScale
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -174,16 +207,48 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if touchedNode.name == "AttackButton" {
             player.attack()
             simpleShake()
-            
+
             touchedNode.run(.sequence([
               .fadeAlpha(to: 0.3, duration: 0.1),
               .fadeAlpha(to: 1, duration: 0.1)
             ]))
-
+            
             return;
         }
 
         player.move(location: touch)
+    }
+    
+    func scene1() {
+        run(.sequence([
+            .run({
+                self.subtitle.isHidden = false
+                self.subtitle.updateAttributedText("Oh, my lord! Thank goodness you activated me just in time!\nCan’t you listen the importance of the sound? I can talk!")
+            }),
+            .playSoundFileNamed("voiceover-1", waitForCompletion: true)
+        ]), completion: {
+            self.run(.sequence([
+                .wait(forDuration: 1),
+                .run({
+                    self.subtitle.updateAttributedText("Come on, my lord! Tap on this splendid technology\ncalled screen to walk! ")
+                    
+                }),
+                .playSoundFileNamed("voiceover-3", waitForCompletion: true),
+                .wait(forDuration: 2),
+                .run({
+                    self.subtitle.updateAttributedText("Come on, my lord! We need to run to the village\nsomething is not quite right there!")
+                }),
+                .run({
+                    self.cam.run(.scale(to: 1, duration: 2))
+                    self.soundManager.playPlayback(intensity: 1)
+                }),
+                .playSoundFileNamed("voiceover-2", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                    self.createRandomTorch()
+                })
+            ]))
+        })
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SpriteKit
 
 extension SKLabelNode {
     func updateAttributedText(_ text: String) {

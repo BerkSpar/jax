@@ -11,4 +11,5 @@ class GameManager {
     static var debugMode = false
     static var attackShakingEnabled = false
     static var attackFullAnimationEnabled = false
+    static var canMove = false
 }

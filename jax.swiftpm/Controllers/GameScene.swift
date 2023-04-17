@@ -9,16 +9,6 @@ import Foundation
 import SpriteKit
 import AVFAudio
 
-extension SKLabelNode {
-    func updateAttributedText(_ text: String) {
-        if let attributedText = attributedText {
-            let mutableAttributedText = NSMutableAttributedString(attributedString: attributedText)
-            mutableAttributedText.mutableString.setString(text)
-            self.attributedText = mutableAttributedText
-        }
-    }
-}
-
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var player = PlayerNode()
     var cam = SKCameraNode()
@@ -206,8 +196,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let touchedNode = atPoint(touch)
         if touchedNode.name == "AttackButton" {
             player.attack()
-            simpleShake()
-
+            
+            if (GameManager.attackShakingEnabled) {
+                simpleShake()
+            }
+            
             touchedNode.run(.sequence([
               .fadeAlpha(to: 0.3, duration: 0.1),
               .fadeAlpha(to: 1, duration: 0.1)

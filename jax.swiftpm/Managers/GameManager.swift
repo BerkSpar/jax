@@ -8,5 +8,7 @@
 import Foundation
 
 class GameManager {
-    static var debugMode: Bool = false
+    static var debugMode = false
+    static var attackShakingEnabled = false
+    static var attackFullAnimationEnabled = false
 }

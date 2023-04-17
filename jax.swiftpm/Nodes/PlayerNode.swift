@@ -133,7 +133,8 @@ class PlayerNode: SKSpriteNode {
     }
     
     func attackAnimation() {
-        let spriteSheet = Array(0...5).map { SKTexture(imageNamed: "warrior_attack_\($0)") }
+        let range = GameManager.attackFullAnimationEnabled ? [0, 1, 2, 3, 4, 5] : [0, 5]
+        let spriteSheet = range.map { SKTexture(imageNamed: "warrior_attack_\($0)") }
         
         self.run(.animate(with: spriteSheet, timePerFrame: 0.05), withKey: "attack")
     }

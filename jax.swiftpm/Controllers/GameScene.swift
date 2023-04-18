@@ -68,7 +68,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         let spawn = scene!.childNode(withName: "EnemySpawnPoint")!
         
         let enemy = EnemyNode()
-        enemy.position = spawn.position
+        
+        let randomX = Int(spawn.position.x - 10)...Int(spawn.position.x + 10)
+        let randomY = Int(spawn.position.y - 10)...Int(spawn.position.y + 10)
+        
+        enemy.position = CGPoint(x: Int.random(in: randomX), y: Int.random(in: randomY))
         
         addChild(enemy)
 
@@ -358,7 +362,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if (killCount == 1) {
             run(.sequence([
-                .wait(forDuration: 1),
                 .run({
                     self.subtitle.isHidden = false
                     self.subtitle.updateAttributedText("SCREEN SHAKING!")
@@ -373,7 +376,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         if (killCount == 2) {
             run(.sequence([
-                .wait(forDuration: 1),
+                .wait(forDuration: 2),
                 .run({
                     self.cam.run(.scale(to: 1, duration: 1))
                     self.subtitle.isHidden = false
@@ -384,6 +387,101 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     self.subtitle.isHidden = true
                     self.createRandomTorch()
                     self.createRandomTorch()
+                })
+            ]))
+        }
+        
+        if (killCount == 3) {
+            self.attackCompletion = self.scene4
+            self.killCount = 0
+        }
+    }
+    
+    func scene4() {
+        killCount += 1
+        
+        if (killCount == 1) {
+            run(.sequence([
+                .wait(forDuration: 2),
+                .run({
+                    self.subtitle.updateAttributedText("Glorious! Keep it up, my lord.\nI am going to give you a new power")
+                    self.subtitle.isHidden = false
+                }),
+                .playSoundFileNamed("voiceover-8", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                }),
+                .wait(forDuration: 1),
+                .run({
+                    self.subtitle.isHidden = false
+                    self.subtitle.updateAttributedText("PERSISTENCE!")
+                }),
+                .playSoundFileNamed("voiceover-9", waitForCompletion: true),
+                .run({
+                    self.soundManager.playPlayback(intensity: 4)
+                    self.subtitle.isHidden = true
+                    self.createRandomTorch()
+                }),
+                .wait(forDuration: 4),
+                .run({
+                    self.createRandomTorch()
+                    self.createRandomTorch()
+                })
+            ]))
+        }
+        
+        if (killCount == 3) {
+            self.attackCompletion = scene5
+            self.killCount = 0
+        }
+    }
+    
+    func scene5() {
+        killCount += 1
+        
+        if (killCount == 1) {
+            run(.sequence([
+                .run({
+                    self.subtitle.updateAttributedText("Wow, check out how crowded the village is now!")
+                    self.subtitle.isHidden = false
+                }),
+                .playSoundFileNamed("voiceover-10", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                    self.createRandomTorch()
+                }),
+                .wait(forDuration: 3),
+                .run({
+                    self.createRandomTorch()
+                    self.createRandomTorch()
+                }),
+                .wait(forDuration: 10),
+                .run({
+                    self.createRandomTorch()
+                    self.createRandomTorch()
+                    
+                    self.subtitle.updateAttributedText("Oh no, they're coming in droves now.\nYou need to get ready, my lord!")
+                    self.subtitle.isHidden = false
+                    
+                    self.soundManager.playPlayback(intensity: 5)
+                }),
+                .playSoundFileNamed("voiceover-11", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                }),
+                .wait(forDuration: 10),
+                .run({
+                    self.subtitle.isHidden = false
+                    self.subtitle.updateAttributedText("Can’t you see? With all this powers\nyou are able to annihilated all your enemies")
+                }),
+                .playSoundFileNamed("voiceover-12", waitForCompletion: false),
+                .wait(forDuration: 5),
+                .run({
+                    self.subtitle.updateAttributedText("You are unstoppable")
+                }),
+                .wait(forDuration: 3),
+                .run({
+                    self.subtitle.isHidden = true
                 })
             ]))
         }

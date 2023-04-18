@@ -76,8 +76,10 @@ class PlayerNode: SKSpriteNode {
         
         attackAnimation()
         
-        enemyInContact?.kill()
-        completion()
+        if (enemyInContact != nil) {
+            enemyInContact!.kill()
+            completion()
+        }
     }
     
     func stopMove() {

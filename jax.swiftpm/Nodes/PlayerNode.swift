@@ -18,15 +18,24 @@ class PlayerNode: SKSpriteNode {
         
         name = "player"
         zPosition = 100
+                
+        configurePhysics()
         
-        let attackFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
-        attackFrame.position.x += 32
+    }
+    
+    private var enemyInContact: EnemyNode?
+    
+    func didContact(_ other: SKNode) {
+        if (other.name != "torch") { stopMove() }
         
-        if (GameManager.debugMode) {
-            attackFrame.strokeColor = .red
-            addChild(attackFrame)
-        }
-        
+        if (other.name == "torch") { enemyInContact = (other as! EnemyNode) }
+    }
+    
+    func endContact(_ other: SKNode) {
+        if (other.name == "torch") { enemyInContact = nil }
+    }
+    
+    func configurePhysics() {
         let physicsFrame = SKShapeNode(circleOfRadius: 32)
         
         if (GameManager.debugMode) {
@@ -62,10 +71,13 @@ class PlayerNode: SKSpriteNode {
         ])))
     }
     
-    func attack() {
+    func attack(_ completion: () -> Void) {
         stopMove()
         
         attackAnimation()
+        
+        enemyInContact?.kill()
+        completion()
     }
     
     func stopMove() {
@@ -77,27 +89,6 @@ class PlayerNode: SKSpriteNode {
     
     func move(location: CGPoint) {
         placeCrosshair(location: location)
-        
-//        runningAnimation()
-//
-//        if (location.x < position.x) {
-//            xScale = -1;
-//        } else {
-//            xScale = 1;
-//        }
-//
-//        let runAction = SKAction.move(
-//            to: CGPoint(
-//                x: location.x,
-//                y: location.y
-//            ),
-//            duration: location.distance(point: position) * 0.005
-//        )
-//
-//        run(runAction, completion: {
-//            self.removeCrosshair()
-//            self.idleAnimation()
-//        })
                 
         let move = SKAction.customAction(withDuration: TimeInterval(1), actionBlock: {
             (node,elapsedTime) in

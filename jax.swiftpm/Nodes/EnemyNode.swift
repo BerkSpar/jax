@@ -15,6 +15,8 @@ class EnemyNode: SKSpriteNode {
         columns: 7
     )
     
+    private var hasContact: Bool = false
+    
     init() {
         let texture = sheet.textureForColumn(column: 0, row: 2)!
         
@@ -25,14 +27,54 @@ class EnemyNode: SKSpriteNode {
         name = "torch"
         zPosition = 90
         
-        let attackFrame = SKShapeNode(rectOf: CGSize(width: 64, height: 64))
-        attackFrame.position.x += 32
-        
-        if (GameManager.debugMode) {
-            attackFrame.strokeColor = .red
-            addChild(attackFrame)
+        configurePhysics()
+    }
+    
+    func kill() {
+        run(.sequence([
+            .run({
+                self.alpha = 0.5
+            }),
+            .wait(forDuration: 0.2),
+            .run({
+                self.alpha = 1
+            }),
+            .wait(forDuration: 0.2),
+            .run({
+                self.alpha = 0.5
+            }),
+            .wait(forDuration: 0.2),
+            .run({
+                self.alpha = 1
+            }),
+            .removeFromParent()
+        ]))
+    }
+    
+    func attack() {
+        if (self.action(forKey: "attack_player") == nil) {
+            run(.repeatForever(.sequence([
+                .run({
+                    self.attackAnimation()
+                }),
+                .wait(forDuration: 2)
+            ])), withKey: "attack_player")
         }
-        
+    }
+    
+    func didContact(_ other: SKNode) {
+        if (other.name == "player") {
+            hasContact = true
+        }
+    }
+    
+    func endContact(_ other: SKNode) {
+        if (other.name == "player") {
+            hasContact = false
+        }
+    }
+    
+    func configurePhysics() {
         let physicsFrame = SKShapeNode(circleOfRadius: 32)
         
         if (GameManager.debugMode) {
@@ -42,14 +84,10 @@ class EnemyNode: SKSpriteNode {
         physicsBody = SKPhysicsBody(circleOfRadius: 32)
         physicsBody?.categoryBitMask = PhysicsCategory.torch
         physicsBody?.contactTestBitMask = PhysicsCategory.waterGround | PhysicsCategory.player
-        physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch
+        physicsBody?.collisionBitMask = PhysicsCategory.waterGround | PhysicsCategory.torch | PhysicsCategory.tree
         physicsBody?.usesPreciseCollisionDetection = false
         physicsBody?.affectedByGravity = false
         physicsBody?.allowsRotation = false
-    }
-    
-    func attack() {
-        
     }
     
     func stopMove() {
@@ -61,9 +99,7 @@ class EnemyNode: SKSpriteNode {
     func follow(player: PlayerNode) {
         let followPlayer = SKAction.customAction(withDuration: TimeInterval(Int.max), actionBlock: {
             (node,elapsedTime) in
-            let distance = node.position.distance(point: player.position)
-            
-            if (distance > 80) {
+            if (!self.hasContact) {
                 self.runningAnimation()
                 
                 let dx = player.position.x - node.position.x
@@ -73,7 +109,7 @@ class EnemyNode: SKSpriteNode {
                 node.position.y += cos(angle) * 2
                 node.xScale = player.position.x < node.position.x ? -1 : 1
             } else {
-                self.idleAnimation()
+                self.attack()
             }
         })
         
@@ -116,11 +152,9 @@ class EnemyNode: SKSpriteNode {
     }
     
     func attackAnimation() {
-        self.removeAction(forKey: "running")
-        self.removeAction(forKey: "idle")
-        
         if (self.action(forKey: "attack") == nil) {
-            let spriteSheet = Array(0...5).map { sheet.textureForColumn(column: $0, row: 0)! }
+            let range = GameManager.attackFullAnimationEnabled ? [0, 1, 2, 3, 4, 5] : [0, 5]
+            let spriteSheet = range.map { sheet.textureForColumn(column: $0, row: 0)! }
             
             self.run(.animate(with: spriteSheet, timePerFrame: 0.05), withKey: "attack")
         }

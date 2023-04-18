@@ -39,7 +39,7 @@ class SoundManager {
     func playPlayback(intensity: Int = 1) {
         for i in 1...playbackAudioCount {
             if (i <= intensity) {
-                audioPlayers[i-1].volume = AVAudioSession.sharedInstance().outputVolume
+                audioPlayers[i-1].volume = 5
             } else {
                 audioPlayers[i-1].volume = 0
             }

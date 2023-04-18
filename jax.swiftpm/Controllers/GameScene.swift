@@ -9,6 +9,8 @@ import Foundation
 import SpriteKit
 import AVFAudio
 
+typealias SimpleCallBack = () -> ()
+
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var player = PlayerNode()
     var cam = SKCameraNode()
@@ -18,6 +20,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var subtitle = SKLabelNode()
     var attackButton = SKSpriteNode()
     var splash = SKShapeNode()
+    var attackCompletion: SimpleCallBack?
+    private var killCount = 0
     
     override func sceneDidLoad() {
         super.sceneDidLoad()
@@ -37,20 +41,34 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             return;
         }
         
+        if (nodeA.name == "torch" || nodeB.name == "torch") {
+            nodeA.name == "torch" ? (nodeA as! EnemyNode).didContact(nodeB) : (nodeB as! EnemyNode).didContact(nodeA)
+        }
+        
         if (nodeA.name == "player" || nodeB.name == "player") {
-            player.stopMove()
+            nodeA.name == "player" ? (nodeA as! PlayerNode).didContact(nodeB) : (nodeB as! PlayerNode).didContact(nodeA)
+        }
+    }
+    
+    func didEnd(_ contact: SKPhysicsContact) {
+        guard let nodeA = contact.bodyA.node, let nodeB = contact.bodyB.node else {
+            return;
+        }
+        
+        if (nodeA.name == "torch" || nodeB.name == "torch") {
+            nodeA.name == "torch" ? (nodeA as! EnemyNode).endContact(nodeB) : (nodeB as! EnemyNode).endContact(nodeA)
+        }
+        
+        if (nodeA.name == "player" || nodeB.name == "player") {
+            nodeA.name == "player" ? (nodeA as! PlayerNode).endContact(nodeB) : (nodeB as! PlayerNode).endContact(nodeA)
         }
     }
     
     func createRandomTorch() {
-        let rangeX = Int(player.position.x + 50)..<Int(player.position.x + 300)
-        let rangeY = Int(player.position.y + 50)..<Int(player.position.y + 300)
+        let spawn = scene!.childNode(withName: "EnemySpawnPoint")!
         
         let enemy = EnemyNode()
-        enemy.position = CGPoint(
-            x: Int.random(in: rangeX),
-            y: Int.random(in: rangeY)
-        )
+        enemy.position = spawn.position
         
         addChild(enemy)
 
@@ -159,7 +177,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 )
                 
                 mapNode.physicsBody?.categoryBitMask = PhysicsCategory.tree
-                mapNode.physicsBody?.collisionBitMask = PhysicsCategory.player
+                mapNode.physicsBody?.collisionBitMask = PhysicsCategory.player | PhysicsCategory.torch
                 mapNode.physicsBody?.isDynamic = false
             }
             
@@ -178,7 +196,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 )
                 
                 mapNode.physicsBody?.categoryBitMask = PhysicsCategory.tree
-                mapNode.physicsBody?.collisionBitMask = PhysicsCategory.player
+                mapNode.physicsBody?.collisionBitMask = PhysicsCategory.player | PhysicsCategory.torch
                 mapNode.physicsBody?.isDynamic = false
             }
         }
@@ -233,7 +251,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
         let touchedNode = atPoint(touch)
         if touchedNode.name == "AttackButton" {
-            player.attack()
+            player.attack {
+                attackCompletion?()
+            }
 
             if (GameManager.attackShakingEnabled) {
                 simpleShake()
@@ -266,7 +286,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             .wait(forDuration: 0.5),
             .run({
                 self.subtitle.isHidden = false
-                self.subtitle.updateAttributedText("Oh, my lord! Thank goodness you activated me just in time!\nCan’t you listen the importance of the sound? I can talk!")
+                self.subtitle.updateAttributedText("Oh, my lord! Thank godness you activated me just in time!\nCan’t you listen the importance of the sound? I can talk!")
             }),
             .playSoundFileNamed("voiceover-1", waitForCompletion: true)
         ]), completion: {
@@ -288,9 +308,85 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 .playSoundFileNamed("voiceover-2", waitForCompletion: true),
                 .run({
                     self.subtitle.isHidden = true
+                }),
+                .wait(forDuration: 3),
+                .run({
+                    self.attackButton.isHidden = false
+                    self.subtitle.isHidden = false
+                    self.subtitle.updateAttributedText("Your first enemy is approaching!\nGet ready to fight to win this battle!")
+                    self.createRandomTorch()
+                }),
+                .playSoundFileNamed("voiceover-4", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                    self.attackCompletion = self.scene2
                 })
             ]))
         })
+    }
+    
+    func scene2() {
+        attackCompletion = nil
+        
+        run(.sequence([
+            .wait(forDuration: 2),
+            .run({
+                self.subtitle.isHidden = false
+                self.subtitle.updateAttributedText("Take a deep breath. That's not looking too great.\nWe need to add some extra juice to this!")
+            }),
+            .playSoundFileNamed("voiceover-5", waitForCompletion: false),
+            .wait(forDuration: 5),
+            .run({
+                self.subtitle.updateAttributedText("It's what will take you to the next level and \nmake you truly awesome. Let's go!")
+            }),
+            .wait(forDuration: 5),
+            .run({
+                self.subtitle.isHidden = true
+                GameManager.attackShakingEnabled = true
+                GameManager.attackFullAnimationEnabled = true
+                self.soundManager.playPlayback(intensity: 3)
+                self.createRandomTorch()
+                self.createRandomTorch()
+                
+                self.attackCompletion = self.scene3
+            }),
+        ]))
+    }
+
+    func scene3() {
+        killCount += 1
+        
+        if (killCount == 1) {
+            run(.sequence([
+                .wait(forDuration: 1),
+                .run({
+                    self.subtitle.isHidden = false
+                    self.subtitle.updateAttributedText("SCREEN SHAKING!")
+                    self.cam.run(.scale(to: 0.5, duration: 1))
+                }),
+                .playSoundFileNamed("voiceover-6", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                })
+            ]))
+        }
+        
+        if (killCount == 2) {
+            run(.sequence([
+                .wait(forDuration: 1),
+                .run({
+                    self.cam.run(.scale(to: 1, duration: 1))
+                    self.subtitle.isHidden = false
+                    self.subtitle.updateAttributedText("My lord, can’t you see how much of a difference it\nmakes?! But get ready, 'cause there's more to come!")
+                }),
+                .playSoundFileNamed("voiceover-7", waitForCompletion: true),
+                .run({
+                    self.subtitle.isHidden = true
+                    self.createRandomTorch()
+                    self.createRandomTorch()
+                })
+            ]))
+        }
     }
 }
 

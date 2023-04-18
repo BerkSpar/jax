@@ -13,4 +13,5 @@ class PhysicsCategory {
     static let tree: UInt32 = 4
     static let house: UInt32 = 8
     static let torch: UInt32 = 16
+    static let attackPlayer: UInt32 = 32
 }

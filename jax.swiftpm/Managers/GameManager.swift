@@ -12,4 +12,6 @@ class GameManager {
     static var attackShakingEnabled = false
     static var attackFullAnimationEnabled = false
     static var canMove = false
+    static var deadPersistenceEnabled = false
+    static var simpleDeath = true
 }

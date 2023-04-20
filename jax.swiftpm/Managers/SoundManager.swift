@@ -39,9 +39,9 @@ class SoundManager {
     func playPlayback(intensity: Int = 1) {
         for i in 1...playbackAudioCount {
             if (i <= intensity) {
-                audioPlayers[i-1].volume = 5
+                audioPlayers[i-1].setVolume(5, fadeDuration: 1)
             } else {
-                audioPlayers[i-1].volume = 0
+                audioPlayers[i-1].setVolume(0, fadeDuration: 3)
             }
         }
     }

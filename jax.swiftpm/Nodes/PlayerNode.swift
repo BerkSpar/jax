@@ -78,6 +78,7 @@ class PlayerNode: SKSpriteNode {
         
         if (enemyInContact != nil) {
             enemyInContact!.kill()
+            enemyInContact = nil
             completion()
         }
     }

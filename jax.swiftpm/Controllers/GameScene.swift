@@ -98,7 +98,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         let label = SKLabelNode()
         label.name = "background"
-        label.text = "[Tap anywhere to start your journey]"
+        label.text = "A"
         label.position = CGPoint(x: 0, y: -100)
         label.fontSize = 24
         
@@ -110,7 +110,37 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         scene?.addChild(splash)
         
         label.run(.repeatForever(.sequence([
-            .fadeAlpha(to: 0.5, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "Great"
+            }),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "Experience"
+            }),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "Is"
+            }),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "Comming"
+            }),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "[Tap to start your journey]"
+            }),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .fadeAlpha(to: 1, duration: 1),
+            .fadeAlpha(to: 0.3, duration: 1),
+            .run({
+                label.text = "A"
+            }),
             .fadeAlpha(to: 1, duration: 1),
         ])))
     }
@@ -221,8 +251,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 if (isEdgeTile) {
                     let x = CGFloat(col) * tileSize.width - halfWidth
                     let y = CGFloat(row) * tileSize.height - halfHeight
-                                        
-                    
+
+
                     let tileNode = SKShapeNode()
                     tileNode.position = CGPoint(x: x, y: y)
                     tileNode.physicsBody = SKPhysicsBody.init(rectangleOf: tileSize, center: CGPoint(x: tileSize.width / 2.0, y: tileSize.height / 2.0))
@@ -231,9 +261,9 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                     tileNode.physicsBody?.categoryBitMask = PhysicsCategory.waterGround
                     tileNode.physicsBody?.collisionBitMask = PhysicsCategory.player
                     tileNode.physicsBody?.usesPreciseCollisionDetection = true
-                    
+
                     tileMap.addChild(tileNode)
-                    
+
                     if (GameManager.debugMode) {
                         let rect = SKShapeNode(rect: CGRect(x: 0, y: 0, width: tileSize.width, height: tileSize.height))
                         tileNode.addChild(rect)
@@ -245,6 +275,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     override func update(_ currentTime: TimeInterval) {
         camera?.position = player.position
+        splash.position = player.position
         ui.position = cam.position
         ui.xScale = cam.xScale
         ui.yScale = cam.yScale
@@ -286,6 +317,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func scene1() {
+        attackCompletion = nil
+        
         run(.sequence([
             .wait(forDuration: 0.5),
             .run({
@@ -348,6 +381,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 self.subtitle.isHidden = true
                 GameManager.attackShakingEnabled = true
                 GameManager.attackFullAnimationEnabled = true
+                GameManager.simpleDeath = false
                 self.soundManager.playPlayback(intensity: 3)
                 self.createRandomTorch()
                 self.createRandomTorch()
@@ -413,6 +447,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 }),
                 .wait(forDuration: 1),
                 .run({
+                    GameManager.deadPersistenceEnabled = true
                     self.subtitle.isHidden = false
                     self.subtitle.updateAttributedText("PERSISTENCE!")
                 }),
@@ -482,9 +517,155 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 .wait(forDuration: 3),
                 .run({
                     self.subtitle.isHidden = true
+                    self.attackCompletion = nil
+                    self.killCount = 0
+                    self.scene6()
                 })
             ]))
         }
+    }
+    
+    func scene6() {
+        GameManager.canMove = false
+        ui.isHidden = true
+        
+        let background = SKShapeNode(rectOf: frame.size)
+        background.name = "scene6"
+        background.position = player.position
+        background.fillColor = .black
+        background.zPosition = 1000000
+        background.alpha = 0
+        
+        let label = SKLabelNode()
+        label.name = "scene6"
+        label.text = ""
+        label.fontSize = 24
+        label.numberOfLines = 2
+        
+        background.addChild(label)
+        splash = background
+        
+        scene?.addChild(background)
+        
+        cam.run(.scale(to: 0.5, duration: 1))
+        background.run(.fadeAlpha(to: 1, duration: 1))
+        
+        label.run(.sequence([
+            .wait(forDuration: 1),
+            .run({
+                label.text = "This story is about game design"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 3),
+            .fadeOut(withDuration: 1),
+            
+            
+            .run({
+                label.text = "Did you see? Some elements was added"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 3),
+            .fadeOut(withDuration: 1),
+
+            .run({
+                label.text = "to make the experience better"
+                self.soundManager.playPlayback(intensity: 0)
+            }),
+            .fadeIn(withDuration: 1),
+
+            .wait(forDuration: 3),
+            .fadeOut(withDuration: 1),
+            
+            .run({
+                label.text = "The music is increasing"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 4),
+            .run({
+                label.text = "Every"
+                self.soundManager.playPlayback(intensity: 1)
+            }),
+            .wait(forDuration: 4),
+            .run({
+                label.text = "Moment"
+                self.soundManager.playPlayback(intensity: 2)
+            }),
+            .wait(forDuration: 4),
+            .run({
+                label.text = "While"
+                self.soundManager.playPlayback(intensity: 3)
+            }),
+            .wait(forDuration: 4),
+            .run({
+                label.text = "You"
+                self.soundManager.playPlayback(intensity: 4)
+            }),
+            .wait(forDuration: 4),
+            .run({
+                label.text = "Playing"
+                self.soundManager.playPlayback(intensity: 5)
+            }),
+            .fadeOut(withDuration: 1),
+            .run({
+                background.run(.fadeAlpha(to: 0, duration: 1))
+            }),
+            .wait(forDuration: 1),
+            .run({
+                GameManager.attackFullAnimationEnabled = false
+                GameManager.attackShakingEnabled = false
+                self.player.attack({})
+            }),
+            .wait(forDuration: 2),
+            .run({
+                GameManager.attackFullAnimationEnabled = true
+                GameManager.attackShakingEnabled = true
+                
+                self.player.attack({})
+                self.simpleShake()
+            }),
+            .wait(forDuration: 2),
+            .run({
+                self.bombShake()
+            }),
+            .wait(forDuration: 1),
+            .run({
+                background.run(.fadeAlpha(to: 1, duration: 1))
+            }),
+            .wait(forDuration: 1),
+            
+            .run({
+                label.text = "As you can see"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 3),
+            .fadeOut(withDuration: 1),
+            
+            .run({
+                label.text = "The screen shakes too"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 3),
+            .fadeOut(withDuration: 1),
+            
+            .run({
+                label.text = "Thank you for playing!"
+            }),
+            .fadeIn(withDuration: 1),
+            .wait(forDuration: 3),
+            
+            .run({
+                background.run(.sequence([
+                    .fadeAlpha(to: 0, duration: 1),
+                    .run({
+                        self.cam.run(.scale(to: 1, duration: 1))
+                        self.ui.isHidden = false
+                        GameManager.canMove = true
+                    }),
+                    .removeFromParent()
+                ]))
+            })
+        ]))
+        
     }
 }
 

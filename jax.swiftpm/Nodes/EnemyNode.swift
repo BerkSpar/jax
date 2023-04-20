@@ -31,6 +31,11 @@ class EnemyNode: SKSpriteNode {
     }
     
     func kill() {
+        if (GameManager.simpleDeath) {
+            removeFromParent()
+            return
+        }
+        
         run(.sequence([
             .run({
                 self.alpha = 0.5
@@ -47,8 +52,19 @@ class EnemyNode: SKSpriteNode {
             .run({
                 self.alpha = 1
             }),
-            .removeFromParent()
+            .run({
+                if (!GameManager.deadPersistenceEnabled) {
+                    self.removeFromParent()
+                }
+            })
         ]))
+        
+        if (GameManager.deadPersistenceEnabled) {
+            removeAllActions()
+            physicsBody = nil
+            run(.scale(to: 0.5, duration: 1))
+            deadAnimation(node: self)
+        }
     }
     
     func attack() {
@@ -138,6 +154,14 @@ class EnemyNode: SKSpriteNode {
         run(runAction, completion: {
             self.idleAnimation()
         })
+    }
+    
+    func deadAnimation(node: SKSpriteNode) {
+        if (self.action(forKey: "dead") == nil) {
+            let spriteSheet = Array(0...6).map { SKTexture(imageNamed: "dead_\($0)") }
+            
+            node.run(.animate(with: spriteSheet, timePerFrame: 0.1), withKey: "dead")
+        }
     }
     
     func idleAnimation() {
